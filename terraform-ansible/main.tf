@@ -42,8 +42,8 @@ resource "ncloud_public_ip" "public_ip" {
 resource "null_resource" "ssh" {
   provisioner "local-exec" {
     command = <<EOF
-      echo "[ncloud]" > inventory
-      echo "${ncloud_server.server.name} ansible_host='${ncloud_port_forwarding_rule.forwarding.port_forwarding_public_ip}' ansible_port='${ncloud_port_forwarding_rule.forwarding.port_forwarding_external_port}' ansible_ssh_user=root ansible_ssh_pass='${data.ncloud_root_password.rootpwd.root_password}'" >> inventory
+      echo "[jenkins]" > jenkins.ini
+      echo "${ncloud_server.server.name} ansible_host='${ncloud_port_forwarding_rule.forwarding.port_forwarding_public_ip}' ansible_port='${ncloud_port_forwarding_rule.forwarding.port_forwarding_external_port}' ansible_ssh_user=root ansible_ssh_pass='${data.ncloud_root_password.rootpwd.root_password}'" >> jenkins.ini
     
 EOF
 
@@ -52,7 +52,7 @@ EOF
   provisioner "local-exec" {
     command = <<EOF
       ANSIBLE_HOST_KEY_CHECKING=False \
-            ansible-playbook -i inventory playbook.yml
+            ansible-playbook -i jenkins.ini jenkins-playbook.yml
     
 EOF
 

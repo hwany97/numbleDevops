@@ -1,5 +1,5 @@
 ---
-- hosts: ncloud
+- hosts: jenkins
   become: true
   tasks:
     - name: ping

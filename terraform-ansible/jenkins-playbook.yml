@@ -1,0 +1,100 @@
+---
+- hosts: jenkins
+  become: true
+  vars:
+    jenkins_path: /var/lib/jenkins
+  tasks:
+    - name: Install python-apt
+      apt:
+        name: python-apt
+        state: present
+
+    - name: apt-get update
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        force_apt_get: true
+
+    - name: "apt-key"
+      shell:
+        cmd: "wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -"
+
+    - name: "append repo"
+      shell:
+        cmd: "sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'"
+    
+    - name: "apt-get update"
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        force_apt_get: true
+    
+
+    - name: "install jenkins"
+      apt:
+        name: ['jenkins']
+        state: latest
+    
+    - name: "start jenkins"
+      systemd:
+        state: started
+        name: jenkins
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - name: ping
+      ping:
+    
+    - name: enable nginx repo
+      copy:
+        src: nginx.repo
+        dest: /etc/yum.repos.d/nginx.repo
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+
+    - name: install packages
+      yum:
+        name: "{{ packages }}"
+        state: latest
+        update_cache: yes
+      vars:
+        packages:
+        - git
+        - nginx 
+
+    - name: Make sure a service is running
+      systemd:
+        state: started
+        name: nginx
+        enabled: yes
+
+    - name: Download the nginx package for backup version do not install it
+      yum:
+        name: "{{ packages }}"
+        state: latest
+        download_only: true
+      vars:
+        packages:
+        - git
+        - nginx      
+

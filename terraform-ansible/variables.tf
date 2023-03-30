@@ -19,15 +19,15 @@ variable "login_key_name" {
 }
 
 variable "server_name" {
-  default = "nginxserver"
+  default = "jenkinsserver"
 }
 
 variable "server_image_product_code" { 
-  default = "SPSW0LINUX000046"
+  default = "SPSW0LINUX000130"
 }
 
 variable "server_product_code" { 
-  default = "SPSVRSTAND000004" 
+  default = "SPSVRSTAND000005" 
 }
 
 variable "port_forwarding_external_port" {
