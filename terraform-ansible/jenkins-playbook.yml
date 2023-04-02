@@ -19,12 +19,12 @@
 #      shell:
 #        cmd: "curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null"
     
-    - name: somerepo |no apt key
+    - name: download Jenkins apt-key
       get_url:
         url: https://pkg.jenkins.io/debian/jenkins.io-2023.key
         dest: /usr/share/keyrings/jenkins-keyring.asc
 
-    - name: somerepo | apt source
+    - name: add Jenkins repo
       apt_repository:
         repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian binary/"
         state: present
@@ -65,4 +65,9 @@
       become: true
 
     
-    
+
+    - name: Install Ansible
+      apt:
+        name: ansible
+        state: present
+      become: yes  
