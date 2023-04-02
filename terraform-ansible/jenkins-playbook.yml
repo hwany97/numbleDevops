@@ -1,100 +1,68 @@
 ---
-- hosts: jenkins
-  become: true
-  vars:
-    jenkins_path: /var/lib/jenkins
+
+- name: Jenkins Playbook
+  gather_facts: false
+  hosts: all
+  become: yes
   tasks:
-    - name: Install python-apt
-      apt:
-        name: python-apt
-        state: present
-
-    - name: apt-get update
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600
-        force_apt_get: true
-
-    - name: "apt-key"
-      shell:
-        cmd: "wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -"
-
-    - name: "append repo"
-      shell:
-        cmd: "sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'"
-    
     - name: "apt-get update"
       apt:
         update_cache: yes
-        cache_valid_time: 3600
-        force_apt_get: true
-    
+        cache_valid_time: 86400
 
-    - name: "install jenkins"
+    - name: "install azure-cli pre-req"
       apt:
-        name: ['jenkins']
+        name: ['ca-certificates', 'curl', 'apt-transport-https', 'lsb-release', 'gnupg']
         state: latest
+
+#    - name: "apt-key"
+#      shell:
+#        cmd: "curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null"
     
-    - name: "start jenkins"
-      systemd:
-        state: started
+    - name: somerepo |no apt key
+      get_url:
+        url: https://pkg.jenkins.io/debian/jenkins.io-2023.key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+
+    - name: somerepo | apt source
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian binary/"
+        state: present
+        filename: jenkins
+      become: true
+
+
+        
+#    - name: "append repo"
+#      shell:
+#        cmd: "echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null"
+    
+    
+
+    - name: "apt-get update"
+      apt:
+        update_cache: yes
+        cache_valid_time: 86400
+
+    #- name: "Install Jenkins"
+    #  apt:
+    #    name: jenkins
+    #    state: latest
+
+
+    - name: Install Java 11
+      apt:
+        name: openjdk-11-jdk
+        state: present
+
+
+    
+    - name: Install Jenkins
+      apt:
         name: jenkins
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    - name: ping
-      ping:
-    
-    - name: enable nginx repo
-      copy:
-        src: nginx.repo
-        dest: /etc/yum.repos.d/nginx.repo
-        owner: root
-        group: root
-        mode: '0644'
-        backup: yes
-
-    - name: install packages
-      yum:
-        name: "{{ packages }}"
         state: latest
         update_cache: yes
-      vars:
-        packages:
-        - git
-        - nginx 
+      become: true
 
-    - name: Make sure a service is running
-      systemd:
-        state: started
-        name: nginx
-        enabled: yes
-
-    - name: Download the nginx package for backup version do not install it
-      yum:
-        name: "{{ packages }}"
-        state: latest
-        download_only: true
-      vars:
-        packages:
-        - git
-        - nginx      
-
+    
+    
